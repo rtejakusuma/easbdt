@@ -2,7 +2,7 @@
 Raden Teja Kusuma - 05111640000012
 
 ## Skema
-
+![Untitled Diagram (1)](https://user-images.githubusercontent.com/32433590/70341004-84bdc380-1884-11ea-8d18-4277bae85048.png)
 ## Spesifikasi
 1. `node1`:
     - OS : `geerlingguy/centos7`
@@ -254,11 +254,11 @@ Setelah melakukan perintah diatas buka browser lalu ketikan alamat `localhost:80
         ```
         - Tunggu prosesnya selesai lalu cek hasilnya di `point_select_run_100.log`
     - Hasil Uji Coba
-        - 3 PD
+        - 3 PD<br>
         ![bench_3](https://user-images.githubusercontent.com/32433590/70259311-84f48b00-17c0-11ea-8cb9-b8a841667d7d.png)
-        - 2 PD
+        - 2 PD<br>
         ![bench_2](https://user-images.githubusercontent.com/32433590/70259310-84f48b00-17c0-11ea-83ea-48f1dfcdd05d.png)
-        - 1 PD
+        - 1 PD<br>
         ![bench_1](https://user-images.githubusercontent.com/32433590/70335272-951c7100-1879-11ea-9762-8df8026c0061.png)
 ## Implementasi Monitoring Grafana
 1. Install node exporter<br>
@@ -392,7 +392,7 @@ tar -zxf grafana-6.5.1.linux-amd64.tar.gz
                 - URL --> `192.168.16.12:9090` ini merupakan url ketika kita menjalankan `prometheus` diatas tadi.
                 - Save
         - Import Dashboard Grafana<br>
-        Disini saya menggunakan dasboard `pd.json, tidb.json, tidb_summary.json, tikv_details.json,` dan `tikv_summary.json`
+        Disini saya menggunakan dasboard `pd.json, tidb.json, tidb_summary.json, tikv_details.json,` dan `tikv_summary.json`. Semua file tersebut bisa dilihat di folder `dashboard`.
         - Hasil Grafana
             - `pd.json`
             ![grafana_PD](https://user-images.githubusercontent.com/32433590/70335178-60a8b500-1879-11ea-82c2-8fba0131a2d4.png)
