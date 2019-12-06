@@ -2,30 +2,15 @@ Run on PD Server
 
 Node1
 cd tidb-v3.0-linux-amd64
-./bin/pd-server --name=pd1 \
-                --data-dir=pd \
-                --client-urls="http://192.168.16.12:2379" \
-                --peer-urls="http://192.168.16.12:2380" \
-                --initial-cluster="pd1=http://192.168.16.12:2380,pd2=http://192.168.16.13:2380,pd3=http://192.168.16.14:2380" \
-                --log-file=pd.log &
+./bin/pd-server --name=pd1 --data-dir=pd --client-urls="http://192.168.16.12:2379" --peer-urls="http://192.168.16.12:2380" --initial-cluster="pd1=http://192.168.16.12:2380,pd2=http://192.168.16.13:2380,pd3=http://192.168.16.14:2380" --log-file=pd.log &
 
 Node2
 cd tidb-v3.0-linux-amd64
-./bin/pd-server --name=pd2 \
-                --data-dir=pd \
-                --client-urls="http://192.168.16.13:2379" \
-                --peer-urls="http://192.168.16.13:2380" \
-                --initial-cluster="pd1=http://192.168.16.12:2380,pd2=http://192.168.16.13:2380,pd3=http://192.168.16.14:2380" \
-                --log-file=pd.log &
+./bin/pd-server --name=pd2 --data-dir=pd --client-urls="http://192.168.16.13:2379" --peer-urls="http://192.168.16.13:2380" --initial-cluster="pd1=http://192.168.16.12:2380,pd2=http://192.168.16.13:2380,pd3=http://192.168.16.14:2380" --log-file=pd.log &
 
 Node3
 cd tidb-v3.0-linux-amd64
-./bin/pd-server --name=pd3 \
-                --data-dir=pd \
-                --client-urls="http://192.168.16.14:2379" \
-                --peer-urls="http://192.168.16.14:2380" \
-                --initial-cluster="pd1=http://192.168.16.12:2380,pd2=http://192.168.16.13:2380,pd3=http://192.168.16.14:2380" \
-                --log-file=pd.log &
+./bin/pd-server --name=pd3 --data-dir=pd --client-urls="http://192.168.16.14:2379" --peer-urls="http://192.168.16.14:2380" --initial-cluster="pd1=http://192.168.16.12:2380,pd2=http://192.168.16.13:2380,pd3=http://192.168.16.14:2380" --log-file=pd.log &
 
 ======================================================
 
@@ -33,24 +18,15 @@ Run on Tikv Server
 
 Node4
 cd tidb-v3.0-linux-amd64
-./bin/tikv-server --pd="192.168.16.12:2379,192.168.16.13:2379,192.168.16.14:2379" \
-                  --addr="192.168.16.15:20160" \
-                  --data-dir=tikv \
-                  --log-file=tikv.log &
+./bin/tikv-server --pd="192.168.16.12:2379,192.168.16.13:2379,192.168.16.14:2379" --addr="192.168.16.15:20160" --data-dir=tikv --log-file=tikv.log &
 
 Node5
 cd tidb-v3.0-linux-amd64
-./bin/tikv-server --pd="192.168.16.12:2379,192.168.16.13:2379,192.168.16.14:2379" \
-                  --addr="192.168.16.16:20160" \
-                  --data-dir=tikv \
-                  --log-file=tikv.log &
+./bin/tikv-server --pd="192.168.16.12:2379,192.168.16.13:2379,192.168.16.14:2379" --addr="192.168.16.16:20160" --data-dir=tikv --log-file=tikv.log &
 
 Node6
 cd tidb-v3.0-linux-amd64
-./bin/tikv-server --pd="192.168.16.12:2379,192.168.16.13:2379,192.168.16.14:2379" \
-                  --addr="192.168.16.17:20160" \
-                  --data-dir=tikv \
-                  --log-file=tikv.log &
+./bin/tikv-server --pd="192.168.16.12:2379,192.168.16.13:2379,192.168.16.14:2379" --addr="192.168.16.17:20160" --data-dir=tikv --log-file=tikv.log &
 
 
 ======================================================
@@ -58,9 +34,7 @@ cd tidb-v3.0-linux-amd64
 Run on TiDB Server
 
 cd tidb-v3.0-linux-amd64
-./bin/tidb-server --store=tikv \
-                  --path="192.168.16.12:2379" \
-                  --log-file=tidb.log &
+./bin/tidb-server --store=tikv --path="192.168.16.12:2379" --log-file=tidb.log &
 
 
 =======================================================
@@ -71,8 +45,7 @@ wget https://github.com/prometheus/node_exporter/releases/download/v0.18.1/node_
 tar -xzf node_exporter-0.18.1.linux-amd64.tar.gz
 
 cd node_exporter-0.18.1.linux-amd64
-./node_exporter --web.listen-address=":9100" \
-    --log.level="info" &
+./node_exporter --web.listen-address=":9100" --log.level="info" &
 
 
 
@@ -87,20 +60,101 @@ wget https://dl.grafana.com/oss/release/grafana-6.5.1.linux-amd64.tar.gz
 tar -xzf prometheus-2.2.1.linux-amd64.tar.gz
 tar -zxf grafana-6.5.1.linux-amd64.tar.gz
 
-addition to prometheus
 
+=============================================
+Prometheus.yml
+
+global:
+  scrape_interval:     15s  # By default, scrape targets every 15 seconds.
+  evaluation_interval: 15s  # By default, scrape targets every 15 seconds.
+  # scrape_timeout is set to the global default value (10s).
+  external_labels:
+    cluster: 'test-cluster'
+    monitor: "prometheus"
+
+scrape_configs:
+  - job_name: 'overwritten-nodes'
+    honor_labels: true  # Do not overwrite job & instance labels.
+    static_configs:
+    - targets:
+      - '192.168.16.12:9100'
+      - '192.168.16.13:9100'
+      - '192.168.16.14:9100'
+      - '192.168.16.15:9100'
+      - '192.168.16.16:9100'
+      - '192.168.16.17:9100'
+
+  - job_name: 'tidb'
+    honor_labels: true  # Do not overwrite job & instance labels.
+    static_configs:
+    - targets:
+      - '192.168.16.12:10080'
+
+  - job_name: 'pd'
+    honor_labels: true  # Do not overwrite job & instance labels.
+    static_configs:
+    - targets:
+      - '192.168.16.12:2379'
+      - '192.168.16.13:2379'
+      - '192.168.16.14:2379'
+
+  - job_name: 'tikv'
+    honor_labels: true  # Do not overwrite job & instance labels.
+    static_configs:
+    - targets:
+      - '192.168.16.15:20180'
+      - '192.168.16.16:20180'
+      - '192.168.16.17:20180'
+=============================================
+jalan prometheus
+
+cd ~
 cd prometheus-2.2.1.linux-amd64
-./prometheus \
-    --config.file="./prometheus.yml" \
-    --web.listen-address=":9090" \
-    --web.external-url="http://192.168.16.33:9090/" \
-    --web.enable-admin-api \
-    --log.level="info" \
-    --storage.tsdb.path="./data.metrics" \
-    --storage.tsdb.retention="15d" &
+./prometheus --config.file="./prometheus.yml" --web.listen-address=":9090" --web.external-url="http://192.168.16.12:9090/" --web.enable-admin-api --log.level="info" --storage.tsdb.path="./data.metrics" --storage.tsdb.retention="15d" &
 
+=============================================
 add grafana.ini
 
+
+=============================================
+grafana.ini
+
+[paths]
+data = ./data
+logs = ./data/log
+plugins = ./data/plugins
+[server]
+http_port = 3000
+domain = 192.168.16.12
+[database]
+[session]
+[analytics]
+check_for_updates = true
+[security]
+admin_user = admin
+admin_password = admin
+[snapshots]
+[users]
+[auth.anonymous]
+[auth.basic]
+[auth.ldap]
+[smtp]
+[emails]
+[log]
+mode = file
+[log.console]
+[log.file]
+level = info
+format = text
+[log.syslog]
+[event_publisher]
+[dashboards.json]
+enabled = false
+path = ./data/dashboards
+[metrics]
+[grafana_net]
+url = https://grafana.net
+==============================================
+Jalan grafana
 cd grafana-6.5.1
-./bin/grafana-server \
-    --config="./conf/grafana.ini" &
+./bin/grafana-server --config="./conf/grafana.ini" &
